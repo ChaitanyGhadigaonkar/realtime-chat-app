@@ -1,4 +1,3 @@
-import React, { useEffect, useLayoutEffect, useState } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import Message from "./Message";
@@ -20,21 +19,13 @@ const formSchema = z.object({
 const MainChat = ({
   room,
   user,
+  messages,
 }: {
   room: string;
   user: { id: string; name: string } | undefined;
+  messages: MessageType[];
 }) => {
-  const [messages, setMessages] = useState<MessageType[]>([]);
   const context = useSocketContext();
-
-  useLayoutEffect(() => {
-    context?.socket?.on(
-      "messages",
-      ({ messages }: { messages: MessageType[] }) => {
-        setMessages(messages);
-      }
-    );
-  }, [context?.socket]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -54,17 +45,6 @@ const MainChat = ({
       roomId: room,
       user,
     });
-    // setMessages([
-    //   ...messages,
-    //   {
-    //     id: messageId,
-    //     name: user?.name as string,
-    //     message: values.message,
-    //     time: dateFormatter(new Date()),
-    //     up: 0,
-    //     noOfUpVotes: 1,
-    //   },
-    // ]);
     form.setValue("message", "");
   }
 
@@ -78,13 +58,15 @@ const MainChat = ({
         {messages &&
           messages.map((message) => {
             return (
-              <Message
-                key={message.id}
-                messageObj={message}
-                type={message.name === user?.name ? "send" : "receive"}
-                user={user}
-                roomId={room}
-              />
+              message.type === "normal" && (
+                <Message
+                  key={message.id}
+                  messageObj={message}
+                  type={message.name === user?.name ? "send" : "receive"}
+                  user={user}
+                  roomId={room}
+                />
+              )
             );
           })}
       </div>

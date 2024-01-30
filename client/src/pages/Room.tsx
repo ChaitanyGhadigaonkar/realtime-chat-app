@@ -2,6 +2,7 @@ import ImportantChat from "@/components/ImportantChat";
 import MainChat from "@/components/MainChat";
 import MediumImportantChat from "@/components/MediumImportantChat";
 import { SocketContextType, useSocketContext } from "@/context/socketContext";
+import { MessageType } from "@/types";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { v1 as uuidV4 } from "uuid";
@@ -10,6 +11,8 @@ const Room = () => {
   const [room, setRoom] = useState("");
 
   const [user, setUser] = useState<undefined | { name: string; id: string }>();
+  const [messages, setMessages] = useState<MessageType[]>([]);
+
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -30,6 +33,12 @@ const Room = () => {
       roomId: room,
       user: { id: user?.id, name: user?.name },
     });
+    context?.socket?.on(
+      "messages",
+      ({ messages }: { messages: MessageType[] }) => {
+        setMessages(messages);
+      }
+    );
 
     return () => {
       context?.socket?.emit("leave-room", {
@@ -46,9 +55,18 @@ const Room = () => {
         <MainChat
           room={room}
           user={user}
+          messages={messages}
         />
-        <MediumImportantChat />
-        <ImportantChat />
+        <MediumImportantChat
+          room={room}
+          user={user}
+          messages={messages}
+        />
+        <ImportantChat
+          room={room}
+          user={user}
+          messages={messages}
+        />
       </div>
     </div>
   );

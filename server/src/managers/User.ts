@@ -12,10 +12,13 @@ export interface Message {
   time: any;
   upVotes: { count: number; users: string[] };
   downVotes: { count: number; users: string[] };
+  type: "normal" | "medium" | "most";
 }
 export interface Room {
   users: User[];
   messages: Message[];
+  MediumImpMessages: Message[];
+  MostImpMessages: Message[];
 }
 
 export class UserManager {
@@ -39,6 +42,8 @@ export class UserManager {
       this.rooms.set(roomId, {
         users: [],
         messages: [],
+        MediumImpMessages: [],
+        MostImpMessages: [],
       });
     }
 
@@ -70,6 +75,7 @@ export class UserManager {
       name: message.name,
       message: message.message,
       time: message.time,
+      type: "normal",
       upVotes,
       downVotes,
     });
@@ -86,6 +92,14 @@ export class UserManager {
         if (message.id === messageId) {
           if (!message.upVotes.users.includes(user.id)) {
             message.upVotes.count += 1;
+            const diff = message.upVotes.count - message.downVotes.count;
+            if (diff >= 3 && diff <= 5) {
+              message.type = "medium";
+            }
+            if (diff > 5) {
+              // TODO: change 5 to 10
+              message.type = "most";
+            }
             message.upVotes.users.push(user.id);
             message.downVotes.users = message.downVotes.users.filter(
               (id) => id !== user.id
@@ -102,6 +116,15 @@ export class UserManager {
         if (message.id === messageId) {
           if (!message.downVotes.users.includes(user.id)) {
             message.downVotes.count += 1;
+
+            const diff = message.upVotes.count - message.downVotes.count;
+            if (diff >= 3 && diff <= 5) {
+              message.type = "medium";
+            }
+            if (diff < 3) {
+              message.type = "normal";
+            }
+
             message.downVotes.users.push(user.id);
             message.upVotes.users = message.upVotes.users.filter(
               (id) => id !== user.id
@@ -117,7 +140,9 @@ export class UserManager {
   ) {
     const room = this.rooms.get(roomId);
     if (room) {
-      io.to(roomId).emit("messages", { messages: room.messages });
+      io.to(roomId).emit("messages", {
+        messages: room.messages,
+      });
     }
   }
 }

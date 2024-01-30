@@ -3,7 +3,12 @@ export type MessageType = {
   name: string;
   message: string;
   time: any;
-  // type: string;
+  type: "normal" | "medium" | "most";
   upVotes: { count: number; users: string[] };
   downVotes: { count: number; users: string[] };
+};
+
+export type User = {
+  id: string;
+  name: string;
 };
