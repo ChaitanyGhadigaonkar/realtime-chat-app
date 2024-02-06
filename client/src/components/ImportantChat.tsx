@@ -18,7 +18,7 @@ const ImportantChat = ({
         <h3 className="font-semibold text-center">Important Chats</h3>( 10
         upvotes)
       </div>
-      <div className="chat-section flex-1 ">chat section</div>
+      {/* <div className="chat-section flex-1 ">chat section</div> */}
       <div className="chat-section h-[700px] overflow-y-auto">
         {messages &&
           messages.map((message) => {

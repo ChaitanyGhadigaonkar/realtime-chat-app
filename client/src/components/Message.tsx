@@ -37,7 +37,7 @@ const Message = ({
       <div
         className={`w-64 h-40 flex flex-col gap-2 rounded-md bg-slate-600 text-white my-2 mx-2 px-2 py-2 `}
       >
-        <div className="top text-sm font-semibold flex gap-1 w-full">
+        <div className="top text-sm font-semibold flex gap-1 w-full justify-between">
           <h4>{user?.name === name ? "you" : name}</h4>
           <p className="text-slate-400 text-xs text-center">
             {time.toLocaleString()}
